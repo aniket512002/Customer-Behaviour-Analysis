@@ -13,7 +13,7 @@ st.title("📊 Customer Behaviour Analysis Dashboard")
 def load_data():
     BASE_DIR = os.path.dirname(__file__)
     file_path = os.path.join(BASE_DIR, "final_clean_data.csv")
-    df = pd.read_csv(file_path)
+    pd.read_csv("../final_clean_data.csv")
     return df
 
 df = load_data()
