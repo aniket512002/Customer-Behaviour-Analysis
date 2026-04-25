@@ -1,5 +1,6 @@
 import pandas as pd
 import streamlit as st
+import os
 
 # Page config
 st.set_page_config(page_title="Customer Behaviour Analysis", layout="wide")
@@ -7,55 +8,36 @@ st.set_page_config(page_title="Customer Behaviour Analysis", layout="wide")
 # Title
 st.title("📊 Customer Behaviour Analysis Dashboard")
 
-# Load dataset
+# -------- LOAD DATA (PERMANENT FIX) --------
 @st.cache_data
 def load_data():
-    df = pd.read_csv("final_clean_data.csv")
+    BASE_DIR = os.path.dirname(__file__)
+    file_path = os.path.join(BASE_DIR, "final_clean_data.csv")
+    df = pd.read_csv(file_path)
     return df
 
 df = load_data()
 
-# Dataset Preview
+# -------- DATA PREVIEW --------
 st.subheader("📌 Dataset Preview")
 st.dataframe(df.head())
 
-# Show columns (debug safety)
+# Debug (safe)
 st.subheader("📂 Dataset Columns")
 st.write(df.columns)
 
-# ---- CATEGORY COLUMN DETECT (auto safe) ----
-category_col = None
-for col in df.columns:
-    if "category" in col.lower():
-        category_col = col
-        break
+# -------- AUTO COLUMN DETECTION --------
+category_col = next((col for col in df.columns if "category" in col.lower()), None)
 
-rating_col = None
-for col in df.columns:
-    if "rating" in col.lower() and "count" not in col.lower():
-        rating_col = col
-        break
+rating_col = next((col for col in df.columns if "rating" in col.lower() and "count" not in col.lower()), None)
 
-rating_count_col = None
-for col in df.columns:
-    if "rating_count" in col.lower() or "review" in col.lower():
-        rating_count_col = col
-        break
+rating_count_col = next((col for col in df.columns if "rating_count" in col.lower() or "review" in col.lower()), None)
 
-price_col = None
-for col in df.columns:
-    if "price" in col.lower():
-        price_col = col
-        break
+price_col = next((col for col in df.columns if "price" in col.lower()), None)
 
-discount_col = None
-for col in df.columns:
-    if "discount" in col.lower():
-        discount_col = col
-        break
+discount_col = next((col for col in df.columns if "discount" in col.lower()), None)
 
-
-# ---- CHARTS ----
+# -------- CHARTS --------
 
 # Top Categories by Reviews
 if category_col and rating_count_col:
@@ -75,11 +57,11 @@ if category_col and price_col:
     avg_price = df.groupby(category_col)[price_col].mean().sort_values(ascending=False)
     st.bar_chart(avg_price)
 
-# Discount Analysis
+# Discount Distribution
 if discount_col:
     st.subheader("🎯 Discount Distribution")
     st.bar_chart(df[discount_col].value_counts())
 
 # Footer
 st.markdown("---")
-st.markdown("Customer Behaviour Analysis")
+st.markdown("© Customer Behaviour Analysis Project")
